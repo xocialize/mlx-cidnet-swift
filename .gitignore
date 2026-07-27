@@ -6,6 +6,6 @@ xcuserdata/
 # Oracle working tree — all regenerable, see PORT-STATUS.md "Reproduce".
 oracle/upstream/
 oracle/.venv/
+oracle/hf*/          # any Hugging Face download cache (hf/, hf-cache/, hf-rt/, hf-roundtrip/)
 oracle/converted/
-oracle/hf-cache/
 oracle/__pycache__/
