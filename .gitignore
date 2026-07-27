@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+.swiftpm/
+xcuserdata/
+
+# Oracle working tree — all regenerable, see PORT-STATUS.md "Reproduce".
+oracle/upstream/
+oracle/.venv/
+oracle/converted/
+oracle/hf-cache/
+oracle/__pycache__/

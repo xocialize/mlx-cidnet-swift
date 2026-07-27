@@ -1,0 +1,16 @@
+mlx-cidnet-swift
+================
+
+Port code: MIT (this repository).
+
+Upstream model and weights
+--------------------------
+HVI-CIDNet — https://github.com/Fediory/HVI-CIDNet
+Yan et al., "HVI: A New Color Space for Low-light Image Enhancement", CVPR 2025.
+1st place, NTIRE 2025 Low-Light Enhancement Challenge.
+
+License: MIT, Copyright (c) 2024 Fediory Feng. See LICENSE-upstream.
+No non-commercial clause appears anywhere in the upstream repository.
+
+Weights are published first-party by the authors on the Hugging Face Hub under
+the `Fediory/HVI-CIDNet-*` namespace, covered by that same MIT license.

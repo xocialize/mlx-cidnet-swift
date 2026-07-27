@@ -1,0 +1,41 @@
+HVI-CIDNet PyTorch goldens — fp32, CPU, PyTorch NCHW, C-contiguous.
+checkpoint: Fediory/HVI-CIDNet-Generalization
+density_k : 0.98354679  (learned, per-checkpoint)
+constructor: CIDNet()  channels=[36,36,72,144] heads=[1,2,4,8] norm=False
+input contract: RGB [0,1]; no size multiple required (3 bilinear /2 stages).
+
+density_k.npy                                (1,)                       min=+0.983547 max=+0.983547 mean=+0.983547
+hvit_in.npy                                  (1, 3, 64, 64)             min=+0.000016 max=+0.999890 mean=+0.503440
+hvit_out.npy                                 (1, 3, 64, 64)             min=-0.982668 max=+0.999890 mean=+0.251266
+hvit_edge_in.npy                             (1, 3, 1, 8)               min=+0.000000 max=+1.000000 mean=+0.479167
+hvit_edge_out.npy                            (1, 3, 1, 8)               min=-1.000000 max=+1.000000 mean=+0.286084
+phvit_in.npy                                 (1, 3, 64, 64)             min=-0.982668 max=+0.999890 mean=+0.251266
+phvit_out.npy                                (1, 3, 64, 64)             min=+0.000017 max=+0.999890 mean=+0.503440
+roundtrip_out.npy                            (1, 3, 64, 64)             min=+0.000017 max=+0.999890 mean=+0.503440
+layernorm_in.npy                             (1, 36, 32, 32)            min=-4.194435 max=+3.716634 mean=+0.004092
+layernorm_out.npy                            (1, 36, 32, 32)            min=-3.522938 max=+3.344358 mean=-0.003278
+prelu_in.npy                                 (1, 36, 16, 16)            min=-3.516995 max=+3.660398 mean=+0.001994
+prelu_out.npy                                (1, 36, 16, 16)            min=-0.465022 max=+3.660398 mean=+0.346504
+prelu_weight.npy                             (1,)                       min=+0.132221 max=+0.132221 mean=+0.132221
+down_in.npy                                  (1, 36, 32, 32)            min=-4.712161 max=+4.241561 mean=-0.003926
+down_out.npy                                 (1, 36, 16, 16)            min=-0.847757 max=+5.420829 mean=+0.341574
+up_x.npy                                     (1, 144, 8, 8)             min=-3.486111 max=+3.942819 mean=+0.018275
+up_y.npy                                     (1, 72, 16, 16)            min=-4.014207 max=+4.399053 mean=-0.001631
+up_out.npy                                   (1, 72, 16, 16)            min=-0.122867 max=+5.903400 mean=+0.448796
+cab_x.npy                                    (1, 36, 16, 16)            min=-3.473981 max=+4.009564 mean=+0.001583
+cab_y.npy                                    (1, 36, 16, 16)            min=-3.314265 max=+3.678586 mean=-0.008041
+cab_out.npy                                  (1, 36, 16, 16)            min=-0.153580 max=+0.150341 mean=+0.000481
+iel_in.npy                                   (1, 36, 16, 16)            min=-3.555205 max=+4.509454 mean=+0.002132
+iel_out.npy                                  (1, 36, 16, 16)            min=-1.651503 max=+2.465495 mean=-0.024442
+lca_x.npy                                    (1, 36, 16, 16)            min=-4.318133 max=+3.946865 mean=+0.018745
+lca_y.npy                                    (1, 36, 16, 16)            min=-4.562901 max=+4.002867 mean=+0.014404
+hv_lca_out.npy                               (1, 36, 16, 16)            min=-2.075424 max=+2.209038 mean=-0.028098
+i_lca_out.npy                                (1, 36, 16, 16)            min=-4.315180 max=+3.871043 mean=+0.036396
+full_64_in.npy                               (1, 3, 64, 64)             min=+0.000002 max=+0.999871 mean=+0.499548
+full_64_out.npy                              (1, 3, 64, 64)             min=+0.000000 max=+0.905108 mean=+0.403990
+full_128_in.npy                              (1, 3, 128, 128)           min=+0.000033 max=+0.999962 mean=+0.500056
+full_128_out.npy                             (1, 3, 128, 128)           min=+0.000000 max=+0.912060 mean=+0.407702
+full_256_in.npy                              (1, 3, 256, 256)           min=+0.000001 max=+0.999987 mean=+0.500124
+full_256_out.npy                             (1, 3, 256, 256)           min=+0.000000 max=+0.978646 mean=+0.426695
+full_dark256_in.npy                          (1, 3, 256, 256)           min=+0.009187 max=+0.110307 mean=+0.060193
+full_dark256_out.npy                         (1, 3, 256, 256)           min=+0.035667 max=+0.358592 mean=+0.206234
