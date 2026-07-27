@@ -38,14 +38,32 @@ public final class CIDNetRelightPackage: ModelPackage {
             license: LicenseDeclaration(weightLicense: .mit, portCodeLicense: .mit),
             provenance: Provenance(sourceRepo: "Fediory/HVI-CIDNet", revision: "main", tier: 1),
             requirements: RequirementsManifest(
-                // 1,975,569 params @ fp32 = 7.9 MB — the weights floor is negligible and the work
-                // is all activation. ⚠️ FLAGGED-provisional: scaled from the model's size and the
-                // sibling image packages' measured ratios; replace with an in-app `phys_footprint`
-                // run before this package is marked validated.
+                // ✅ MEASURED through the REAL `MLXServeEngine` via `MLXEngineTestKit
+                // .ValidationHarness` (`swift run cidnet-validate`), process `phys_footprint`:
+                //
+                //   [cidnet-generalization] SPLIT floor=0.04GB peak=5.87GB act=5.84GB retain=2.66GB
+                //                           engine=0.06GB reserve=3.00GB load=0.0s run=2.9s @1920x1080
+                //
+                // 🔴 The previous declaration (3.0 GB activation) was extrapolated from sibling ratios
+                // and UNDER-DECLARED by ~2x against the measured 5.84 GB. Under-declaring is the
+                // dangerous direction — it falsely admits on tight Macs, which is precisely the
+                // BiRefNet-best failure mode. Corrected to 6.5 GB with margin.
+                //
+                // The activation dwarfs the 7.9 MB of weights because this model does NOT tile: it
+                // runs the full frame, and both branches carry full-resolution feature maps. Tiling
+                // it the way FFTformer and Restormer are tiled is the obvious future lever.
+                //
+                // NOTE `retain=2.66GB` — much larger than the siblings' ~0.35 GB. The live model is
+                // holding full-frame intermediates; it frees on evict, so it is transient, not
+                // resident, but it is worth watching if this package is ever co-resident.
+                //
+                // ⚠️ Measured on the MODEL path, not the bypass: the validate target feeds a
+                // deliberately dark image, since a mid-grey one would trip the luma gate and measure
+                // a footprint with no model in it.
                 footprints: [
                     QuantFootprint(quant: .fp32,
-                                   residentBytes: 60_000_000,
-                                   peakActivationBytes: 3_000_000_000),
+                                   residentBytes: 80_000_000,
+                                   peakActivationBytes: 6_500_000_000),
                 ],
                 requiredBackends: [.metalGPU],
                 os: OSRequirement(minMacOS: SemanticVersion(major: 26, minor: 0, patch: 0)),

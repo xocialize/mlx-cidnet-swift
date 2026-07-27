@@ -12,6 +12,7 @@ let package = Package(
         .library(name: "CIDNetMLXCore", targets: ["CIDNetMLXCore"]),
         .library(name: "MLXCIDNet", targets: ["MLXCIDNet"]),
         .executable(name: "cidnet-gate", targets: ["CIDNetGate"]),
+        .executable(name: "cidnet-validate", targets: ["CIDNetValidate"]),
     ],
     dependencies: [
         // 0.38.0 = contract 1.29.0, which introduces the `imageRelight` capability.
@@ -53,6 +54,20 @@ let package = Package(
             resources: [.copy("Resources/goldens")]
         ),
         // Parity gates need a real Metal context — executable lane, not the test target.
+        // Engine-driven authoritative footprint via MLXEngineTestKit (phys_footprint),
+        // as opposed to the gate's MLX-pool `--bench` which under-reads by ~2.7x.
+        .executableTarget(
+            name: "CIDNetValidate",
+            dependencies: [
+                "MLXCIDNet",
+                .product(name: "MLX", package: "mlx-swift"),
+                .product(name: "MLXToolKit", package: "mlx-engine-swift"),
+                .product(name: "MLXServeCore", package: "mlx-engine-swift"),
+                .product(name: "MLXEngineTestKit", package: "mlx-engine-swift"),
+            ],
+            path: "Sources/Validate",
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
         .executableTarget(
             name: "CIDNetGate",
             dependencies: [
