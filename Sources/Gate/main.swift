@@ -169,7 +169,7 @@ guard let mode = args.first else {
 
 // fp32 parity gates pin to the CPU stream — Apple-GPU fp32 accumulates enough per-op error to
 // both mask real bugs and imitate them.
-Device.setDefault(device: .cpu)
+Device.setDefault(device: Device(.cpu))
 
 switch mode {
 case "--s0":
