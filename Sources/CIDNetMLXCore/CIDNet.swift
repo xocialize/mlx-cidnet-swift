@@ -134,12 +134,50 @@ public final class CIDNet: Module, @unchecked Sendable {
         return conv(replicationPad1(x))
     }
 
-    /// NHWC RGB in [0,1] → enhanced NHWC RGB.
+    /// The UNet halves the resolution three times and each `NormUpsample` concatenates its ×2 upsample
+    /// with the skip, so H and W must be multiples of this.
+    public static let sizeMultiple = 8
+
+    /// `n` rounded up to the next multiple of `sizeMultiple`.
+    static func alignedExtent(_ n: Int) -> Int {
+        (n + sizeMultiple - 1) / sizeMultiple * sizeMultiple
+    }
+
+    /// Source indices that extend an axis of length `n` to `extent` by reflection about the last
+    /// sample, without repeating it — torch's `'reflect'`: `n = 570, extent = 576` appends 568…563.
+    /// Folds again at the first sample, so an axis shorter than its pad (where torch refuses) still
+    /// extends.
+    static func reflectIndices(_ n: Int, extent: Int) -> [Int32] {
+        guard n > 1 else { return [Int32](repeating: 0, count: extent) }
+        let period = 2 * (n - 1)
+        return (0 ..< extent).map { i in
+            let m = i % period
+            return Int32(m < n ? m : period - m)
+        }
+    }
+
+    /// NHWC RGB in [0,1] → enhanced NHWC RGB, at any H and W.
+    ///
+    /// An extent that isn't a multiple of 8 makes `NormUpsample`'s concatenate fail, and mlx-swift's
+    /// error handler is `fatalError`: a 570×320 image killed the whole host process (AB-T-0223).
+    /// Upstream's eval (`eval_hf.py`, `app.py`) reflect-pads the bottom and right edges up to the next
+    /// multiple of 8 and crops the output back; so does this. An aligned input runs unpadded.
+    public func callAsFunction(_ x: MLXArray) -> MLXArray {
+        let (h, w) = (x.dim(1), x.dim(2))
+        let (paddedH, paddedW) = (Self.alignedExtent(h), Self.alignedExtent(w))
+        guard paddedH != h || paddedW != w else { return forwardAligned(x) }
+        let padded = x
+            .take(MLXArray(Self.reflectIndices(h, extent: paddedH)), axis: 1)
+            .take(MLXArray(Self.reflectIndices(w, extent: paddedW)), axis: 2)
+        return forwardAligned(padded)[0..., ..<h, ..<w]
+    }
+
+    /// The network itself; H and W must be multiples of `sizeMultiple`.
     ///
     /// The variable names track `net/CIDNet.py` line for line, including the places upstream reads
     /// a *pre*-LCA tensor into the next downsample (`i_enc3 = IE_block3(i_enc2)`, not `i_enc3`) —
     /// those are load-bearing, since the LCA output survives only through the jump connections.
-    public func callAsFunction(_ x: MLXArray) -> MLXArray {
+    private func forwardAligned(_ x: MLXArray) -> MLXArray {
         let hvi = trans.forward(x)
         let i = hvi[.ellipsis, 2].expandedDimensions(axis: -1)
 

@@ -15,6 +15,11 @@ fetching a second one through swift-transformers' `HubApi`. It also reads `<root
 versions downloaded, so existing installs aren't fetched again. `HubApi` remains only the backstop outside the engine
 (no store, or nothing materialized); an explicit `weightsURL` bypasses all of it.
 
+**Any image size since 0.1.2 (AB-T-0223).** The UNet halves the resolution three times, so the network needs H and W
+divisible by 8. The forward reflect-pads the bottom and right edges up to the next multiple of 8, as upstream's eval
+does, and crops the output back. Before 0.1.2 a size like 570×320 hit an MLX concatenate `fatalError`, which took the
+host process down with it.
+
 ## Products
 
 | Product | Depends on | Purpose |
