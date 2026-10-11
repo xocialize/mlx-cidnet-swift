@@ -82,6 +82,10 @@ extension CIDNetConfiguration: WeightSourcing {
     /// Honors the explicit `weightsURL` first, then the default store probe (MS-2).
     public func missingWeightSources(storeRoot: URL?) -> [WeightSource] {
         if let weightsURL, FileManager.default.fileExists(atPath: weightsURL.path) { return [] }
-        return defaultMissingWeightSources(storeRoot: storeRoot)
+        // Also present: the copy load() downloaded through `HubApi` before 0.1.1 (`StoreWeights`), so existing installs
+        // aren't fetched again.
+        return defaultMissingWeightSources(storeRoot: storeRoot).filter {
+            !StoreWeights.installedByHubAPI(StoreWeights.weightsFile, repo: $0.repo, root: storeRoot)
+        }
     }
 }

@@ -9,6 +9,12 @@ clause anywhere. Yan et al., *HVI: A New Color Space for Low-light Image Enhance
 
 Weights: [`mlx-community/HVI-CIDNet-*-fp32`](https://huggingface.co/collections/mlx-community/hvi-cidnet-mlx-6a67a33c0faa782edbc6752e).
 
+**Engine-materialized weights read in place since 0.1.1 (AB-A-0112).** MLXEngine downloads the declared
+`weightSources` into its model store before `load()`; `load()` reads that copy (flat or snapshot layout) instead of
+fetching a second one through swift-transformers' `HubApi`. It also reads `<root>/models/<org>/<name>/`, where earlier
+versions downloaded, so existing installs aren't fetched again. `HubApi` remains only the backstop outside the engine
+(no store, or nothing materialized); an explicit `weightsURL` bypasses all of it.
+
 ## Products
 
 | Product | Depends on | Purpose |

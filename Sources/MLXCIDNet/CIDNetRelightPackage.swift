@@ -7,7 +7,6 @@ import UniformTypeIdentifiers
 import MLX
 import MLXToolKit
 import MLXProfiling
-import Hub
 import CIDNetMLXCore
 
 public enum CIDNetPackageError: Error, Equatable {
@@ -97,12 +96,9 @@ public final class CIDNetRelightPackage: ModelPackage {
             }
             url = explicit
         } else {
-            let hub = configuration.modelsRootDirectory.map { HubApi(downloadBase: $0) } ?? HubApi()
-            let dir = try await hub.snapshot(from: Hub.Repo(id: configuration.variant.repo),
-                                             matching: ["model.safetensors"]) { progress, speed in
-                WeightDownloadProgress.report(fraction: progress.fractionCompleted, bytesPerSecond: speed)
-            }
-            url = dir.appendingPathComponent("model.safetensors")
+            // The engine materialized the declared `weightSources` before load() (contract 1.24): `StoreWeights` reads
+            // its copy, and downloads through `HubApi` only for a caller outside the engine.
+            url = try await StoreWeights.resolve(repo: configuration.variant.repo, root: configuration.modelsRootDirectory)
         }
         let net = CIDNet()
         try net.loadWeights(from: url)
